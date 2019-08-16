@@ -1,4 +1,10 @@
 import java.util.Random;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.IOException;
 
 public class QTable
 {	
@@ -212,5 +218,70 @@ public class QTable
 	
 		double updatedVal = (1 - alpha) * currentVal + alpha * (reward + gamma * maxFutureQ);
 		currentVal = table[state[0]][state[1]][state[2]][state[3]][action] = updatedVal;	
+	}
+
+	public void save(String fileName)
+	{
+		File file = new File(fileName);
+		try
+		{
+			if(!file.createNewFile())
+			{
+				file.delete();
+				file.createNewFile();
+			}
+			
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			for(int a = 0; a < 5; a++) {
+			for(int b = 0; b < 5; b++) {
+			for(int c = 0; c < 5; c++) {
+			for(int d = 0; d < 5; d++) {
+				for(int e = 0; e < 8; e++)
+					writer.write(Double.toString(table[a][b][c][d][e]) + " ");
+				writer.newLine();
+			}}}}
+
+			writer.write("END");
+			writer.flush();
+			writer.close();
+		}
+		catch(IOException e)
+		{
+			System.out.println("save IOException");	
+		}	
+	}
+
+	private void load(String fileName)
+	{
+		final String NEW_LINE = System.getProperty("line.separator");
+		File file = new File(fileName);
+		try
+		{
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			for(int a = 0; a < 5; a++) {
+			for(int b = 0; b < 5; b++) {
+			for(int c = 0; c < 5; c++) {
+			for(int d = 0; d < 5; d++) {
+				String actionLine = reader.readLine();
+				int index = 0;
+				for(int e = 0; e < 8; e++)
+				{
+					String stringVal = "";
+					while(actionLine.charAt(index) != ' ')
+					{
+						stringVal += actionLine.charAt(index);
+						index++;	
+					}
+					index++;
+
+					double doubleVal = Double.parseDouble(stringVal);
+					table[a][b][c][d][e] = doubleVal;
+				}		
+			}}}}
+		}
+		catch(IOException e)
+		{
+			System.out.println("load IOException");
+		}
 	}
 }
