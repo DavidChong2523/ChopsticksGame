@@ -27,14 +27,15 @@ class ChopsticksGame
 		System.out.println("Enter board position: ");
 		Scanner input = new Scanner(System.in);
 		int position = input.nextInt();		
-
-		board.set(false, RIGHT, position % 10);
-		position /= 10;
-		board.set(false, LEFT, position % 10);
-		position /= 10;
-		board.set(true, RIGHT, position % 10);
-		position /= 10;
-		board.set(true, LEFT, position % 10);
+	
+		int[] boardValues = new int[4];
+		for(int i = 0; i < 4; i++)
+		{
+			boardValues[i] = position % 10;
+			position /= 10;
+		}
+		board = new ChopsticksBoard(boardValues[3], boardValues[2], 
+					    boardValues[1], boardValues[0]);
 
 		playGame();
 	}
@@ -116,8 +117,7 @@ class ChopsticksGame
 	private boolean gameOver()
 	{
 		// P2 wins
-		if(board.get(true, LEFT) == 0 &&
-		   board.get(true, RIGHT) == 0)
+		if(board.winP2())
 		{
 			board.display();
 			System.out.println("P2 wins!");
@@ -126,8 +126,7 @@ class ChopsticksGame
 		}
 		
 		// P1 wins
-		if(board.get(false, LEFT) == 0 && 
-		   board.get(false, RIGHT) == 0)
+		if(board.winP1())
 		{
 			board.display();
 			System.out.println("P1 wins!");

@@ -1,0 +1,4 @@
+QOpponentv2:
+alpha: 0.2, gamma: 0.9, epsilon: 1, decays to 0 uniformly at each episode across all episodes
+opponent:
+from QOpponentv1, with epsilon 0.3

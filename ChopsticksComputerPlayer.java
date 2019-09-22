@@ -37,7 +37,7 @@ public class ChopsticksComputerPlayer extends ChopsticksPlayer
 		for(int i = 0; i < moveList.size(); i++)
 		{
 			// copy current board position and play a move onto it
-			copyBoard = copy(board);
+			copyBoard = new ChopsticksBoard(board);
 			playMove(copyBoard, getPlayer(), moveList.get(i));
 			
 			// evaluate the copied board
@@ -92,7 +92,7 @@ public class ChopsticksComputerPlayer extends ChopsticksPlayer
 			do
 			{
 				// play the move onto a copy board and evaluate it
-				copyBoard = copy(board);
+				copyBoard = new ChopsticksBoard(board);
 				playMove(copyBoard, isP1, moveList.get(i));
 				// check for new maxValue and alpha
 				maxValue = Math.max(maxValue, minimax(copyBoard, depth + 1, !isP1, alpha, beta));
@@ -114,7 +114,7 @@ public class ChopsticksComputerPlayer extends ChopsticksPlayer
 			do
 			{
 				// play the move onto a copy board and evaluate it
-				copyBoard = copy(board);
+				copyBoard = new ChopsticksBoard(board);
 				playMove(copyBoard, isP1, moveList.get(i));
 				// check for new minValue and beta
 				minValue = Math.min(minValue, minimax(copyBoard, depth + 1, !isP1, alpha, beta));
@@ -186,23 +186,12 @@ public class ChopsticksComputerPlayer extends ChopsticksPlayer
 	{
 		if(move[0] == HIT)
 		{
-			ChopsticksPlayer.hit(board, isP1, move[1], move[2]);
+			board.hit(isP1, move[1], move[2]);
 		}
 		else 
 		{
-			ChopsticksPlayer.split(board, isP1, move[1], move[2]);
+			board.split(isP1, move[1], move[2]);
 		}
-	}
-
-	// copy given ChopsticksBoard into new ChopsticksBoard
-	public static ChopsticksBoard copy(ChopsticksBoard board)
-	{
-		int l1 = board.get(true, LEFT);
-		int r1 = board.get(true, RIGHT);
-		int l2 = board.get(false, LEFT);
-		int r2 = board.get(false, RIGHT);
-
-		return new ChopsticksBoard(l1, r1, l2, r2);
 	}
 
 	// evaluate given ChopsticksBoard from the perspective of isP1

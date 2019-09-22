@@ -31,7 +31,7 @@ public class ChopsticksHumanPlayer extends ChopsticksPlayer
 				int opponentHand = input.nextInt() - 1;
 				
 				// hit opponentHand with playerHand
-				ChopsticksPlayer.hit(board, getPlayer(), playerHand, opponentHand);
+				board.hit(getPlayer(), playerHand, opponentHand);
 				break;
 			// split
 			case 2:
@@ -42,7 +42,7 @@ public class ChopsticksHumanPlayer extends ChopsticksPlayer
 				int amount = input.nextInt();
 				
 				// subtract amount from subtractHand and add to other hand
-				ChopsticksPlayer.split(board, getPlayer(), subtractHand, amount);
+				board.split(getPlayer(), subtractHand, amount);
 				break;
 			default:
 				System.out.println("Invalid player choice");

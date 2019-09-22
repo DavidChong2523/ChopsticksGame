@@ -1,4 +1,5 @@
 import java.util.Random;
+import java.util.ArrayList;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
@@ -8,6 +9,9 @@ import java.io.IOException;
 
 public class QTable
 {	
+	final int WIN_REWARD = 1;	
+	final int LOSE_REWARD = -1;
+	
 	final int LEFT = 0;
 	final int RIGHT = 1;
 
@@ -33,16 +37,16 @@ public class QTable
 	   index 4-7 represent splits: 1, 2, 3, or 4
 	*/ 
 	private double[][][][][] table;
-	private double alpha;		// learning rate, 0 < a <= 1
-	private double gamma;		// discount factor
-	private double epsilon;		// exploration factor
 	
-	public QTable(double a, double y, double e)
+	public QTable()
 	{
 		initTable();
-		alpha = a;
-		gamma = y;
-		epsilon = e;
+	}	
+	
+	public QTable(String fileName)
+	{
+		table = new double[5][5][5][5][8];
+		load(fileName);
 	}
 	
 	private void initTable()
@@ -58,41 +62,15 @@ public class QTable
 		for(int d = 0; d < 5; d++) {
 		for(int e = 0; e < 8; e++)
 		{
-			if(isLegalAction(a, b, c, d, e))
+			if(a == 0 && b == 0)
+				table[a][b][c][d][e] = WIN_REWARD;
+			else if(c == 0 && d == 0)
+				table[a][b][c][d][e] = LOSE_REWARD;
+			else if(isLegalAction(a, b, c, d, e))
 				table[a][b][c][d][e] = randNum.nextGaussian();
 			else
 				table[a][b][c][d][e] = NEG_INFINITY;
 		}}}}}
-	}
-
-	public void setAlpha(double a)
-	{
-		alpha = a;
-	}
-
-	public double getAlpha()	
-	{
-		return alpha;
-	}
-
-	public void setGamma(double y)
-	{
-		gamma = y;
-	}
-
-	public double setGamma()
-	{
-		return gamma;
-	}
-
-	public void setEpsilon(double e)
-	{
-		epsilon = e;
-	}
-
-	public double getEpsilon(double e)
-	{
-		return epsilon;
 	}
 
 	private boolean isLegalAction(int playerLeft, int playerRight, int opponentLeft, int opponentRight, int action)
@@ -118,10 +96,11 @@ public class QTable
 		else
 		{
 			int maxValue = (playerLeft > playerRight) ? playerLeft : playerRight;
-			if(action < maxValue)
-				return false;
-			
 			int splitValue = action - 3;
+
+			if(splitValue > maxValue)
+				return false;
+
 			if(maxValue == playerLeft)
 				return (playerRight + splitValue) != maxValue;
 			else
@@ -129,21 +108,28 @@ public class QTable
 		}
 	}
 
-	public int action(ChopsticksBoard board, boolean isP1)
+	public int action(int[] state, double epsilon)
 	{
+		double[] actions = table[state[0]][state[1]][state[2]][state[3]];
+		
 		Random randNum = new Random();
-		if(randNum.nextDouble() < epsilon)
+		if(randNum.nextDouble() < epsilon)		// random move
 		{
-			int randIndex = randNum.nextInt(8);
-			playMove(board, isP1, randIndex);
-			return randIndex;				
+			ArrayList<Integer> legalActions = new ArrayList<Integer>();
+			for(int i = 0; i < actions.length; i++)
+			{
+				if(actions[i] == NEG_INFINITY)
+					continue;
+
+				legalActions.add(i);
+			}
+
+			int randIndex = legalActions.get(randNum.nextInt(legalActions.size()));
+			return randIndex;	
 		}
 
-		double[] actions = table[board.get(isP1, LEFT)][board.get(isP1, RIGHT)]
-					[board.get(!isP1, LEFT)][board.get(!isP1, RIGHT)];
-		
 		int maxIndex = -1;
-		for(int i = 0; i < actions.length; i++)
+		for(int i = 0; i < actions.length; i++)		// best move
 		{
 			if(actions[i] == NEG_INFINITY)
 				continue;
@@ -153,61 +139,11 @@ public class QTable
 				maxIndex = i;
 		}
 
-		playMove(board, isP1, maxIndex);
 		return maxIndex;
 	}
-
-	private void playMove(ChopsticksBoard board, boolean isP1, int actionIndex)
-	{
-		switch(actionIndex)
-		{
-		case HIT_LL:
-			hit(board, isP1, LEFT, LEFT);
-			break;
-		case HIT_LR:
-			hit(board, isP1, LEFT, RIGHT);
-			break;
-		case HIT_RL:
-			hit(board, isP1, RIGHT, LEFT);
-			break;
-		case HIT_RR:
-			hit(board, isP1, RIGHT, RIGHT);
-			break;
-		case SPLIT_1:
-			split(board, isP1, 1);
-			break;
-		case SPLIT_2:
-			split(board, isP1, 2);
-			break;
-		case SPLIT_3:
-			split(board, isP1, 3);
-			break;
-		case SPLIT_4:
-			split(board, isP1, 4);
-			break;
-		default:
-			return;
-		}
-	}
-
-	private void hit(ChopsticksBoard board, boolean isP1, int playerHand, int opponentHand)
-	{
-		int playerValue = board.get(isP1, playerHand);
-		int opponentValue = board.get(isP1, opponentHand);
-		board.set(!isP1, opponentHand, playerValue + opponentValue);
-	}
-
-	private void split(ChopsticksBoard board, boolean isP1, int subtractValue)
-	{
-		int playerHand = (board.get(isP1, LEFT) > board.get(isP1, RIGHT)) ? LEFT : RIGHT;
-		int subtractHandValue = board.get(isP1, playerHand);
-		int addHandValue = board.get(isP1, 1 - playerHand);
-		board.set(isP1, playerHand, subtractHandValue - subtractValue);
-		board.set(isP1, 1 - playerHand, addHandValue + subtractValue);
-	}
-
+	
 	// Qnew(St, At) = (1-a) * Qcurr(St, At) + a * (r + y * Qmax(St+1, At+1))
-	public void updateTable(int[] state, int[] nextState, int action, double reward)
+	public void update(double alpha, double gamma, int[] state, int[] nextState, int action, double reward)
 	{
 		double currentVal = table[state[0]][state[1]][state[2]][state[3]][action];
 		double[] nextActions = table[nextState[0]][nextState[1]][nextState[2]][nextState[3]];
@@ -283,5 +219,38 @@ public class QTable
 		{
 			System.out.println("load IOException");
 		}
+	}
+
+	public void display()
+	{
+		for(int a = 0; a < 5; a++) {
+		for(int b = 0; b < 5; b++) {	
+		for(int c = 0; c < 5; c++) {
+		for(int d = 0; d < 5; d++) {
+			System.out.println("State: ");	
+			System.out.print("Player: "); 
+			for(int i = 0; i < a; i++)
+				System.out.print("|");
+			for(int i = a; i < 5; i++)
+				System.out.print(" ");
+			for(int i = 0; i < b; i++)
+				System.out.print("|");
+			for(int i = b; i < 5; i++)
+				System.out.print(" ");
+			System.out.print("Opponent: ");
+			for(int i = 0; i < c; i++)
+				System.out.print("|");
+			for(int i = c; i < 5; i++)
+				System.out.print(" ");
+			for(int i = 0; i < d; i++)
+				System.out.print("|");
+			for(int i = d; i < 5; i++)
+				System.out.print(" ");
+			System.out.println();
+			System.out.println("Actions: ");
+			for(int e = 0; e < 8; e++)
+				System.out.print(Double.toString(table[a][b][c][d][e]) + " ");
+			System.out.println();
+		}}}}
 	}
 }
