@@ -2,9 +2,6 @@ import java.util.Scanner;
 
 class ChopsticksGame
 {
-	private static final int LEFT = 0;
-	private static final int RIGHT = 1;
-
 	private ChopsticksBoard board;
 	private ChopsticksPlayer player1;
 	private ChopsticksPlayer player2;

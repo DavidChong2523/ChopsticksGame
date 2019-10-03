@@ -1,8 +1,5 @@
 public class ChopsticksBoard
 {
-	private static final int LEFT = 0;
-	private static final int RIGHT = 1;	
-
 	// player hands are represented with an array of size 2
 	// the first element represents the left hand 
 	// the second element represents the right hand
@@ -12,28 +9,28 @@ public class ChopsticksBoard
 	// initialize the board to the beginning state of the game
 	public ChopsticksBoard()
 	{		
-		player1[LEFT] = 1;
-		player1[RIGHT] = 1;
-		player2[LEFT] = 1;
-		player2[RIGHT] = 1;
+		player1[Constants.LEFT] = 1;
+		player1[Constants.RIGHT] = 1;
+		player2[Constants.LEFT] = 1;
+		player2[Constants.RIGHT] = 1;
 	}
 	
 	// initialize the board to a custom state
 	public ChopsticksBoard(int l1, int r1, int l2, int r2)
 	{
-		set(true, LEFT, l1);
-		set(true, RIGHT, r1);
-		set(false, LEFT, l2);
-		set(false, RIGHT, r2);
+		set(true, Constants.LEFT, l1);
+		set(true, Constants.RIGHT, r1);
+		set(false, Constants.LEFT, l2);
+		set(false, Constants.RIGHT, r2);
 	}
 
 	// copy given board
 	public ChopsticksBoard(ChopsticksBoard copyBoard)
 	{
-		set(true, LEFT, copyBoard.get(true, LEFT));
-		set(true, RIGHT, copyBoard.get(true, RIGHT));
-		set(false, LEFT, copyBoard.get(false, LEFT));
-		set(false, RIGHT, copyBoard.get(false, RIGHT));
+		set(true, Constants.LEFT, copyBoard.get(true, Constants.LEFT));
+		set(true, Constants.RIGHT, copyBoard.get(true, Constants.RIGHT));
+		set(false, Constants.LEFT, copyBoard.get(false, Constants.LEFT));
+		set(false, Constants.RIGHT, copyBoard.get(false, Constants.RIGHT));
 	}
 	
 	private void set(boolean isP1, int hand, int value)
@@ -58,9 +55,9 @@ public class ChopsticksBoard
 	// returns false if the action was invalid
 	public boolean hit(boolean isP1, int playerHand, int opponentHand)
 	{
-		if(playerHand != LEFT && playerHand != RIGHT)
+		if(playerHand != Constants.LEFT && playerHand != Constants.RIGHT)
 			return false;
-		if(opponentHand != LEFT && opponentHand != RIGHT)
+		if(opponentHand != Constants.LEFT && opponentHand != Constants.RIGHT)
 			return false;
 
 		// get value of playerHand and opponentHand
@@ -84,7 +81,7 @@ public class ChopsticksBoard
 	// returns false if the action was invalid
 	public boolean split(boolean isP1, int subtractHand, int value)
 	{
-		if(subtractHand != LEFT && subtractHand != RIGHT)
+		if(subtractHand != Constants.LEFT && subtractHand != Constants.RIGHT)
 			return false;
 
 		// get values of player's hands
@@ -109,28 +106,28 @@ public class ChopsticksBoard
 
 	public boolean winP1()
 	{
-		return (player2[LEFT] == 0) && 
-		       (player2[RIGHT] == 0);
+		return (player2[Constants.LEFT] == 0) && 
+		       (player2[Constants.RIGHT] == 0);
 	}
 	
 	public boolean winP2()
 	{
-		return (player1[LEFT] == 0) &&
-		       (player1[RIGHT] == 0);
+		return (player1[Constants.LEFT] == 0) &&
+		       (player1[Constants.RIGHT] == 0);
 	}
 
 	public void display()
 	{
 		// Print P1 left hand
 		System.out.println("P1:");
-		for(int i = 0; i < player1[LEFT]; i++)
+		for(int i = 0; i < player1[Constants.LEFT]; i++)
 		{
 			System.out.print("|");
 		}
 		System.out.print("\t");
 
 		// Print P1 right hand
-		for(int i = 0; i < player1[RIGHT]; i++)
+		for(int i = 0; i < player1[Constants.RIGHT]; i++)
 		{
 			System.out.print("|");
 		}
@@ -138,14 +135,14 @@ public class ChopsticksBoard
 	
 		// Print P2 left hand
 		System.out.println("P2:");
-		for(int i = 0; i < player2[LEFT]; i++)
+		for(int i = 0; i < player2[Constants.LEFT]; i++)
  		{
 			System.out.print("|");
 		}
 		System.out.print("\t");
 
 		// Print P2 right hand
-		for(int i = 0; i < player2[RIGHT]; i++)
+		for(int i = 0; i < player2[Constants.RIGHT]; i++)
 		{	
 			System.out.print("|");
 		}

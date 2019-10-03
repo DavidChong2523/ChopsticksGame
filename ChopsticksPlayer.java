@@ -1,8 +1,5 @@
 public abstract class ChopsticksPlayer
 {	
-	public static final int LEFT = 0;
-	public static final int RIGHT = 1;
-
 	private boolean m_isP1;
 		
 	public ChopsticksPlayer(boolean player)

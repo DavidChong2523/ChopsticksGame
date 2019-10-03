@@ -9,22 +9,8 @@ import java.io.IOException;
 
 public class QTable
 {	
-	final int WIN_REWARD = 1;	
-	final int LOSE_REWARD = -1;
-	
-	final int LEFT = 0;
-	final int RIGHT = 1;
-
-	final int HIT_LL = 0;
-	final int HIT_LR = 1;
-	final int HIT_RL = 2;
-	final int HIT_RR = 3;
-	final int SPLIT_1 = 4;
-	final int SPLIT_2 = 5;
-	final int SPLIT_3 = 6;
-	final int SPLIT_4 = 7;
-
-	final double NEG_INFINITY = -1000;
+	final double WIN_REWARD = 1;	
+	final double LOSE_REWARD = -1;
 
 	/* first 4 dimensions represent state:
 	   dimension 1 represents the player's left hand
@@ -33,8 +19,8 @@ public class QTable
 	   dimension 4 represents the opponent's right hand
 	
 	   final dimension represents possible actions:
-	   index 0-3 represent hits: left-left, left-right, right-left, right-right
-	   index 4-7 represent splits: 1, 2, 3, or 4
+	   value 0-3 represent hits: left-left, left-right, right-left, right-right
+	   value 4-7 represent splits: 1, 2, 3, or 4
 	*/ 
 	private double[][][][][] table;
 	
@@ -47,6 +33,16 @@ public class QTable
 	{
 		table = new double[5][5][5][5][8];
 		load(fileName);
+	}
+
+	public static int[] getState(ChopsticksBoard board, boolean player)
+	{
+		int[] state = new int[4];
+		state[0] = board.get(player, Constants.LEFT);
+		state[1] = board.get(player, Constants.RIGHT);
+		state[2] = board.get(!player, Constants.LEFT);
+		state[3] = board.get(!player, Constants.RIGHT);
+		return state;
 	}
 	
 	private void initTable()
@@ -69,24 +65,24 @@ public class QTable
 			else if(isLegalAction(a, b, c, d, e))
 				table[a][b][c][d][e] = randNum.nextGaussian();
 			else
-				table[a][b][c][d][e] = NEG_INFINITY;
+				table[a][b][c][d][e] = Constants.NEG_INF;
 		}}}}}
 	}
 
 	private boolean isLegalAction(int playerLeft, int playerRight, int opponentLeft, int opponentRight, int action)
 	{
 		// hit
-		if(action < SPLIT_1)	
+		if(action < Constants.SPLIT_1)	
 		{
 			switch(action)
 			{
-			case HIT_LL:
+			case Constants.HIT_LL:
 				return (playerLeft != 0 && opponentLeft != 0);
-			case HIT_LR:
+			case Constants.HIT_LR:
 				return (playerLeft != 0 && opponentRight != 0);
-			case HIT_RL:
+			case Constants.HIT_RL:
 				return (playerRight != 0 && opponentLeft != 0);
-			case HIT_RR:
+			case Constants.HIT_RR:
 				return (playerRight != 0 && opponentRight != 0);
 			default:
 				return false;
@@ -118,7 +114,7 @@ public class QTable
 			ArrayList<Integer> legalActions = new ArrayList<Integer>();
 			for(int i = 0; i < actions.length; i++)
 			{
-				if(actions[i] == NEG_INFINITY)
+				if(actions[i] == Constants.NEG_INF)
 					continue;
 
 				legalActions.add(i);
@@ -131,7 +127,7 @@ public class QTable
 		int maxIndex = -1;
 		for(int i = 0; i < actions.length; i++)		// best move
 		{
-			if(actions[i] == NEG_INFINITY)
+			if(actions[i] == Constants.NEG_INF)
 				continue;
 			else if(maxIndex == -1)
 				maxIndex = i;
@@ -148,7 +144,7 @@ public class QTable
 		double currentVal = table[state[0]][state[1]][state[2]][state[3]][action];
 		double[] nextActions = table[nextState[0]][nextState[1]][nextState[2]][nextState[3]];
 		
-		double maxFutureQ = NEG_INFINITY;
+		double maxFutureQ = Constants.NEG_INF;
 		for(int i = 0; i < nextActions.length; i++)
 			maxFutureQ = (maxFutureQ < nextActions[i]) ? nextActions[i] : maxFutureQ;
 	
